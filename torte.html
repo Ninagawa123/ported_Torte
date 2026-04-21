@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Torte — ver.0.7 browser port</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --case-a: #d6d1c4;
+    --case-b: #aaa493;
+    --case-c: #6b6558;
+    --case-deep: #2b2820;
+    --bezel: #1a1812;
+    --lcd-bg: #b5c3a0;
+    --lcd-bg-2: #9bab82;
+    --lcd-line: #56664c;
+    --lcd-ink: #2a3624;
+    --lcd-dim: #7e8e6e;
+    --accent: #c44236;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 20% 10%, #2a2519 0%, #15120c 70%),
+      #15120c;
+    font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", sans-serif;
+    color: #e6d9b8;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 60px;
+    gap: 16px;
+  }
+
+  .masthead {
+    text-align: center;
+    font-family: "Silkscreen", monospace;
+    color: #d8c88b;
+    letter-spacing: 0.25em;
+    font-size: 11px;
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+  .masthead small {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  /* --- Palm Pilot case --- */
+  .device {
+    width: min(420px, 96vw);
+    background:
+      linear-gradient(180deg, #e5dfd0 0%, #cec7b2 10%, #b8b19d 55%, #8d886f 100%);
+    border-radius: 28px;
+    padding: 22px 22px 30px;
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.6),
+      inset 0 -3px 0 rgba(0,0,0,0.25),
+      0 18px 40px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(0,0,0,0.35);
+    position: relative;
+  }
+
+  /* Top speaker grille / brand line */
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: "Silkscreen", monospace;
+    font-size: 11px;
+    color: #3a3528;
+    letter-spacing: 0.3em;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+  .brand .dots {
+    display: flex;
+    gap: 4px;
+  }
+  .brand .dots span {
+    width: 4px; height: 4px;
+    background: #4c4635;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 0 rgba(0,0,0,0.5);
+  }
+
+  /* LCD bezel + screen */
+  .bezel {
+    background: var(--bezel);
+    border-radius: 14px;
+    padding: 10px;
+    box-shadow:
+      inset 0 2px 5px rgba(0,0,0,0.8),
+      inset 0 -1px 2px rgba(255,255,255,0.04);
+  }
+  .lcd {
+    background:
+      radial-gradient(ellipse at 30% 20%, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
+    border-radius: 6px;
+    padding: 12px 12px 14px;
+    position: relative;
+    color: var(--lcd-ink);
+    font-family: "VT323", "Courier New", monospace;
+    box-shadow:
+      inset 0 0 0 1px rgba(0,0,0,0.3),
+      inset 0 0 30px rgba(40,55,35,0.25);
+    overflow: hidden;
+  }
+  .lcd::before {
+    /* subtle scanlines */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 3px
+    );
+    pointer-events: none;
+    border-radius: 6px;
+  }
+
+  .lcd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: "Silkscreen", monospace;
+    font-size: 11px;
+    border-bottom: 1px dashed var(--lcd-line);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    letter-spacing: 0.1em;
+  }
+  .lcd-header .title {
+    font-family: "Zen Kaku Gothic New", serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    color: var(--lcd-ink);
+    line-height: 1;
+  }
+  .lcd-header .title small {
+    display: block;
+    font-family: "Silkscreen", monospace;
+    font-size: 8px;
+    letter-spacing: 0.35em;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
+  .score-group {
+    display: flex;
+    gap: 14px;
+    text-align: right;
+  }
+  .score-box {
+    line-height: 1.1;
+  }
+  .score-box .label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+  }
+  .score-box .val {
+    font-family: "VT323", monospace;
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .play-area {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: start;
+  }
+  canvas.board {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    min-width: 58px;
+  }
+  .sidebar-label {
+    font-family: "Silkscreen", monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    opacity: 0.75;
+  }
+  .next-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px;
+    border: 1px dashed var(--lcd-line);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: transform 0.15s;
+    user-select: none;
+  }
+  .next-preview:hover { transform: translateY(-1px); }
+  .next-preview.hidden .chip-slot { opacity: 0.35; }
+  canvas.chip-slot {
+    width: 42px;
+    height: 42px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+  }
+  .toggle-hint {
+    font-family: "Silkscreen", monospace;
+    font-size: 7px;
+    letter-spacing: 0.15em;
+    text-align: center;
+    opacity: 0.6;
+  }
+  .status-line {
+    margin-top: 8px;
+    font-family: "VT323", monospace;
+    font-size: 16px;
+    text-align: center;
+    letter-spacing: 0.1em;
+    color: var(--lcd-ink);
+    min-height: 22px;
+    opacity: 0.9;
+  }
+
+  /* Hardware buttons below bezel */
+  .buttons {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 8px;
+  }
+  .hw-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: 20px;
+    font-family: "Silkscreen", monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    background: linear-gradient(180deg, #f2ead7 0%, #bfb8a1 100%);
+    color: #3b3628;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      inset 0 -2px 0 rgba(0,0,0,0.25),
+      0 2px 3px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+  .hw-btn:active {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,0.4),
+      0 1px 1px rgba(0,0,0,0.2);
+  }
+  .hw-btn.red {
+    background: linear-gradient(180deg, #e0967d 0%, #a84a34 100%);
+    color: #fff1e0;
+  }
+
+  /* Game over overlay */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: rgba(30, 45, 28, 0.85);
+    color: #eae1b6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-family: "VT323", monospace;
+    z-index: 10;
+    animation: fadein 0.4s ease-out;
+  }
+  @keyframes fadein { from {opacity:0;} to {opacity:1;} }
+  .overlay h2 {
+    margin: 0;
+    font-family: "Zen Kaku Gothic New", serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+  }
+  .overlay p { margin: 0; font-size: 18px; letter-spacing: 0.1em; }
+  .overlay button {
+    margin-top: 10px;
+    padding: 8px 18px;
+    border: 2px solid #eae1b6;
+    background: transparent;
+    color: #eae1b6;
+    font-family: "Silkscreen", monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  .overlay button:hover { background: #eae1b6; color: #1e2d1c; }
+
+  .footer {
+    font-family: "Silkscreen", monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: #6b6048;
+    text-align: center;
+    margin-top: -4px;
+    line-height: 1.6;
+  }
+  .footer a { color: #a89164; text-decoration: none; }
+
+  @media (max-width: 380px) {
+    .device { padding: 16px 16px 22px; }
+    .lcd { padding: 10px; }
+    .sidebar-label { font-size: 8px; }
+    canvas.chip-slot { width: 34px; height: 34px; }
+    .sidebar { min-width: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  TORTE &nbsp;/&nbsp; Palm Pilot solitaire (1997) &nbsp;/&nbsp; browser port
+  <small>Original by S.Awatsu · 粟津辰功, Ported by Ninagawa123.</small>
+</div>
+
+<div class="device">
+  <div class="brand">
+    <span>TORTE</span>
+    <div class="dots"><span></span><span></span><span></span><span></span></div>
+    <span>v.0.7</span>
+  </div>
+
+  <div class="bezel">
+    <div class="lcd" id="lcd">
+      <div class="lcd-header">
+        <div class="title">
+          Torte
+          <small>取るって云ったら取るんですの</small>
+        </div>
+        <div class="score-group">
+          <div class="score-box">
+            <div class="label">SCORE</div>
+            <div class="val" id="score">0</div>
+          </div>
+          <div class="score-box">
+            <div class="label">HIGH</div>
+            <div class="val" id="hi">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="play-area">
+        <canvas class="board" id="board" width="252" height="252"></canvas>
+        <div class="sidebar">
+          <div class="sidebar-label">NEXT</div>
+          <div class="next-preview" id="nextPreview" title="タップで次の駒を隠す（+1点ボーナス）">
+            <canvas class="chip-slot" id="next0" width="42" height="42"></canvas>
+            <canvas class="chip-slot" id="next1" width="42" height="42"></canvas>
+            <canvas class="chip-slot" id="next2" width="42" height="42"></canvas>
+          </div>
+          <div class="toggle-hint" id="hideHint">TAP&nbsp;TO&nbsp;HIDE</div>
+        </div>
+      </div>
+
+      <div class="status-line" id="status">駒をタップして選び、空きマスへ動かす</div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="hw-btn red" id="btnNew">NEW&nbsp;GAME</button>
+    <button class="hw-btn" id="btnHide">HIDE&nbsp;NEXT</button>
+  </div>
+</div>
+
+<div class="footer">
+  based on Torte ver.0.7 for Palm Pilot &middot; original (c) 1997 S.Awatsu<br>
+  sprites extracted from the original .prc &middot; ruleset preserved
+</div>
+
+<script>
+// ===== Authentic sprite pixel data extracted from Torte07.lzh / torte.prc =====
+// Each sprite is 13 columns x 14 rows, stored as an array of 14 row-bitmasks (MSB = leftmost pixel).
+const SPRITES = {
+  cherry:     [0,6,8,16,2044,1060,616,272,224,64,64,64,496,0],
+  apple:      [0,194,484,1000,1328,1104,2152,2056,4088,2056,2032,128,992,0],
+  watermelon: [0,0,32,1016,1060,2290,2562,2186,2594,2050,2346,1028,1016,0],
+  pineapple:  [0,28,18,14,60,214,3878,3274,1930,3604,3172,1928,496,0],
+  grapes:     [0,58,460,1806,1122,906,850,2018,1374,2026,3448,3040,3584,0],
+  pear:       [0,14,52,72,136,264,1800,2952,3000,3548,1884,108,56,0],
+  orange:     [0,200,218,854,902,1848,1660,3822,3782,3686,1806,1020,504,0],
+};
+
+// Visual palette — tuned to read clearly on the greenish LCD background.
+// Sprites were extracted from the original .prc; names below reflect what
+// they actually depict (not my initial guesses — they're a food cornucopia:
+// cocktail glass, sundae, cupcake, shrimp, grapes, twin cherries, pastry roll).
+const PALETTE = {
+  cherry:     { fill: '#a8833a', shade: '#6b531e', name: 'グラス' },     // martini glass
+  apple:      { fill: '#4e9a3d', shade: '#2f6826', name: 'アイス' },      // ice cream sundae
+  watermelon: { fill: '#d64663', shade: '#8f2841', name: 'ケーキ' },      // cupcake
+  pineapple:  { fill: '#e89a1a', shade: '#a66a08', name: 'エビ' },        // shrimp
+  grapes:     { fill: '#7a4cb0', shade: '#482a6a', name: 'ぶどう' },      // grapes
+  pear:       { fill: '#c42e3b', shade: '#8b1e28', name: 'さくらんぼ' },  // twin cherries
+  orange:     { fill: '#b06820', shade: '#6a3a0e', name: 'パン' },        // pastry roll
+};
+const CHIP_KEYS = Object.keys(SPRITES);
+
+// ===== Game constants =====
+const N = 9;                   // board is 9x9
+const LINE_LEN = 5;            // 5+ to clear
+const NEW_CHIPS_PER_TURN = 3;  // chips spawned when no line cleared
+const THRESHOLD_INITIAL = 5;   // initial chip count on board
+const CELL = 28;               // LCD pixel size per board cell (canvas is 9*28 = 252)
+const CHIP_PX = 13;            // sprite pixel count per cell (chip art 13x14 but we use 13x13 area centered)
+
+// ===== State =====
+let board;             // flat 81-length array; each is null or chip key
+let nextChips;         // array of 3 chip keys for next spawn
+let score;
+let highScore = 0;
+let selected;          // {r,c} or null
+let hideNext = false;
+let consecutiveClears = 0;
+let gameOver = false;
+let animating = false; // lock input during animation
+let flashFrame = 0;    // for selection pulse
+
+// Canvases
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+const nextCanvases = [0,1,2].map(i => document.getElementById('next'+i));
+const scoreEl = document.getElementById('score');
+const hiEl = document.getElementById('hi');
+const statusEl = document.getElementById('status');
+const hideHintEl = document.getElementById('hideHint');
+const nextPreviewEl = document.getElementById('nextPreview');
+
+// ===== Persistent high score =====
+// Prefers localStorage (works on any regular browser) with a fallback to
+// Claude's window.storage API when the page is embedded in that environment.
+const HI_KEY = 'torte_high';
+async function loadHigh() {
+  try {
+    const v = localStorage.getItem(HI_KEY);
+    if (v !== null) {
+      highScore = parseInt(v, 10) || 0;
+      hiEl.textContent = highScore;
+      return;
+    }
+  } catch(e) {}
+  try {
+    if (window.storage && window.storage.get) {
+      const r = await window.storage.get(HI_KEY);
+      if (r && r.value) {
+        highScore = parseInt(r.value, 10) || 0;
+        hiEl.textContent = highScore;
+      }
+    }
+  } catch(e) {}
+}
+async function saveHigh() {
+  try {
+    localStorage.setItem(HI_KEY, String(highScore));
+    return;
+  } catch(e) {}
+  try {
+    if (window.storage && window.storage.set) {
+      await window.storage.set(HI_KEY, String(highScore));
+    }
+  } catch(e) {}
+}
+
+// ===== Drawing primitives =====
+function drawChip(ctx, x, y, key, scale, opts={}) {
+  const sprite = SPRITES[key];
+  const pal = PALETTE[key];
+  const inverted = !!opts.inverted;
+  const alpha = opts.alpha !== undefined ? opts.alpha : 1;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const bg = inverted ? pal.fill : null;
+  const fg = inverted ? '#f6efd5' : pal.fill;
+  const shade = inverted ? pal.shade : pal.shade;
+
+  if (inverted) {
+    ctx.fillStyle = bg;
+    ctx.fillRect(x, y, 13*scale, 13*scale);
+  }
+  // draw pixels - rows 1..13 for the actual art (row 0 is empty, row 13 is grid line)
+  for (let ry = 1; ry <= 12; ry++) {
+    const bits = sprite[ry];
+    for (let cx = 0; cx < 13; cx++) {
+      if (bits & (1 << (12 - cx))) {
+        ctx.fillStyle = fg;
+        ctx.fillRect(x + cx*scale, y + (ry-1)*scale, scale, scale);
+      }
+    }
+  }
+  // little shadow under chip (non-inverted only)
+  if (!inverted) {
+    ctx.fillStyle = shade;
+    ctx.globalAlpha = alpha * 0.35;
+    ctx.fillRect(x+1*scale, y+12*scale, 11*scale, scale);
+  }
+  ctx.restore();
+}
+
+function drawBoard() {
+  const W = canvas.width, H = canvas.height;
+  // Clear with subtle LCD panel color (let the CSS bg show through transparently)
+  ctx.clearRect(0, 0, W, H);
+
+  // grid background
+  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillRect(0, 0, W, H);
+  // grid lines
+  ctx.strokeStyle = 'rgba(42,54,36,0.35)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= N; i++) {
+    const p = i * CELL + 0.5;
+    ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(W, p); ctx.stroke();
+  }
+  // outer frame
+  ctx.strokeStyle = 'rgba(42,54,36,0.9)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(0.5, 0.5, W-1, H-1);
+
+  // selected cell highlight (pulsing)
+  if (selected) {
+    const x = selected.c * CELL, y = selected.r * CELL;
+    const pulse = 0.4 + 0.25 * Math.sin(flashFrame * 0.15);
+    ctx.fillStyle = `rgba(255,255,255,${pulse.toFixed(2)})`;
+    ctx.fillRect(x+1, y+1, CELL-2, CELL-2);
+  }
+
+  // chips
+  const scale = 2; // 13 px * 2 = 26px in a 28px cell = 1px margin each side
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const key = board[r*N+c];
+      if (!key) continue;
+      if (animating && animating.kind === 'move' && r === animating.fromR && c === animating.fromC) continue;
+      if (animating && animating.kind === 'clear' && animating.cells.some(([rr,cc]) => rr===r && cc===c)) {
+        const a = animating.alpha;
+        drawChip(ctx, c*CELL+1, r*CELL+1, key, scale, {alpha: a});
+        continue;
+      }
+      const isSelected = selected && selected.r === r && selected.c === c;
+      const yOffset = isSelected ? -Math.abs(Math.sin(flashFrame*0.2))*2 : 0;
+      drawChip(ctx, c*CELL+1, r*CELL+1 + yOffset, key, scale);
+    }
+  }
+
+  // moving chip
+  if (animating && animating.kind === 'move') {
+    const {fromR, fromC, toR, toC, t, key} = animating;
+    const x = (fromC + (toC-fromC)*t) * CELL + 1;
+    const y = (fromR + (toR-fromR)*t) * CELL + 1 - Math.sin(t*Math.PI)*6;
+    drawChip(ctx, x, y, key, scale);
+  }
+
+  // new-chip pop-in
+  if (animating && animating.kind === 'spawn') {
+    const a = Math.min(1, animating.t);
+    for (const [rr,cc,key] of animating.cells) {
+      const cx = cc*CELL + 1 + 13*(1-a);
+      const cy = rr*CELL + 1 + 13*(1-a);
+      const s = 2*a;
+      if (s > 0) drawChip(ctx, cx, cy, key, s);
+    }
+  }
+}
+
+function drawNext() {
+  nextCanvases.forEach((c, i) => {
+    const cctx = c.getContext('2d');
+    cctx.imageSmoothingEnabled = false;
+    cctx.clearRect(0, 0, c.width, c.height);
+    cctx.fillStyle = 'rgba(255,255,255,0.18)';
+    cctx.fillRect(0,0,c.width,c.height);
+    if (hideNext) {
+      // draw a "?" sprite inspired by the original's hidden-chip glyph
+      cctx.fillStyle = 'rgba(42,54,36,0.75)';
+      cctx.font = 'bold 28px "VT323", monospace';
+      cctx.textAlign = 'center';
+      cctx.textBaseline = 'middle';
+      cctx.fillText('?', c.width/2, c.height/2 + 2);
+    } else {
+      const key = nextChips[i];
+      const scale = 3; // 13*3 = 39, canvas is 42 → 1-2 px margin
+      drawChip(cctx, (c.width - 13*scale)/2, (c.height - 13*scale)/2, key, scale);
+    }
+  });
+  nextPreviewEl.classList.toggle('hidden', hideNext);
+  hideHintEl.textContent = hideNext ? 'HIDDEN +1' : 'TAP TO HIDE';
+}
+
+// ===== Game logic =====
+function cellIdx(r, c) { return r*N + c; }
+function randChip() { return CHIP_KEYS[Math.floor(Math.random() * CHIP_KEYS.length)]; }
+
+function initGame() {
+  board = new Array(N*N).fill(null);
+  score = 0;
+  consecutiveClears = 0;
+  selected = null;
+  gameOver = false;
+  animating = false;
+  // Start with some chips already on the board
+  nextChips = [randChip(), randChip(), randChip()];
+  spawnChips(THRESHOLD_INITIAL, false);   // no scoring on initial spawn
+  nextChips = [randChip(), randChip(), randChip()];
+  scoreEl.textContent = score;
+  hiEl.textContent = highScore;
+  updateStatus('駒をタップして選び、空きマスへ動かす');
+  drawBoard(); drawNext();
+}
+
+function emptyCells() {
+  const out = [];
+  for (let i = 0; i < N*N; i++) if (!board[i]) out.push(i);
+  return out;
+}
+
+// Spawn `count` chips from `nextChips` into random empty cells.
+// If animated, run a short pop-in animation. Returns [] if no space.
+function spawnChips(count, checkLinesAfter = true) {
+  const empties = emptyCells();
+  if (empties.length === 0) return [];
+  const placed = [];
+  const useQueue = count === NEW_CHIPS_PER_TURN;
+  for (let i = 0; i < count && empties.length > 0; i++) {
+    const idx = Math.floor(Math.random() * empties.length);
+    const cell = empties.splice(idx, 1)[0];
+    const key = useQueue ? nextChips[i] : randChip();
+    board[cell] = key;
+    placed.push([Math.floor(cell/N), cell%N, key]);
+  }
+  return placed;
+}
+
+// BFS to test reachability between two cells through empty cells.
+function isReachable(fromR, fromC, toR, toC) {
+  if (fromR === toR && fromC === toC) return false;
+  const visited = new Uint8Array(N*N);
+  const q = [[fromR, fromC]];
+  visited[cellIdx(fromR, fromC)] = 1;
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  while (q.length) {
+    const [r,c] = q.shift();
+    for (const [dr,dc] of dirs) {
+      const nr = r+dr, nc = c+dc;
+      if (nr<0||nr>=N||nc<0||nc>=N) continue;
+      const ni = cellIdx(nr,nc);
+      if (visited[ni]) continue;
+      // target cell must be empty (except the starting cell, but we don't revisit that)
+      if (nr === toR && nc === toC) return true;
+      if (board[ni] !== null) continue;
+      visited[ni] = 1;
+      q.push([nr,nc]);
+    }
+  }
+  return false;
+}
+
+// After placing a chip at (r,c), find all cells that participate in 5+ runs through it.
+// Scans 4 directions. Returns an array of [r,c] cells.
+function findLines(r, c) {
+  const key = board[cellIdx(r,c)];
+  if (!key) return [];
+  const dirs = [[0,1],[1,0],[1,1],[1,-1]]; // horizontal, vertical, diag, anti-diag
+  const toClear = new Set();
+  for (const [dr,dc] of dirs) {
+    const cells = [[r,c]];
+    // extend negative
+    let rr = r-dr, cc = c-dc;
+    while (rr>=0&&rr<N&&cc>=0&&cc<N && board[cellIdx(rr,cc)] === key) {
+      cells.push([rr,cc]); rr-=dr; cc-=dc;
+    }
+    // extend positive
+    rr = r+dr; cc = c+dc;
+    while (rr>=0&&rr<N&&cc>=0&&cc<N && board[cellIdx(rr,cc)] === key) {
+      cells.push([rr,cc]); rr+=dr; cc+=dc;
+    }
+    if (cells.length >= LINE_LEN) {
+      for (const [a,b] of cells) toClear.add(a*100+b);
+    }
+  }
+  return Array.from(toClear).map(v => [Math.floor(v/100), v%100]);
+}
+
+// Check all possible lines on the board (used after multi-chip spawn).
+function findAllLines() {
+  const toClear = new Set();
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+    if (!board[cellIdx(r,c)]) continue;
+    const cells = findLines(r, c);
+    for (const [a,b] of cells) toClear.add(a*100+b);
+  }
+  return Array.from(toClear).map(v => [Math.floor(v/100), v%100]);
+}
+
+function updateStatus(txt) { statusEl.textContent = txt; }
+
+// Compute score for clearing N chips
+function scoreForClear(n) {
+  return (n - 4) * 5;
+}
+
+// ===== Animation driver =====
+function runAnim(spec) {
+  return new Promise(resolve => {
+    animating = spec;
+    const start = performance.now();
+    function frame(now) {
+      const elapsed = (now - start) / spec.duration;
+      if (spec.kind === 'move') {
+        spec.t = Math.min(1, elapsed);
+      } else if (spec.kind === 'clear') {
+        spec.alpha = Math.max(0, 1 - elapsed);
+      } else if (spec.kind === 'spawn') {
+        spec.t = Math.min(1, elapsed);
+      }
+      drawBoard();
+      if (elapsed < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        animating = false;
+        drawBoard();
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function performMove(fromR, fromC, toR, toC) {
+  const key = board[cellIdx(fromR, fromC)];
+  // Animate move
+  await runAnim({ kind:'move', fromR, fromC, toR, toC, key, t:0, duration: 260 });
+  board[cellIdx(fromR, fromC)] = null;
+  board[cellIdx(toR, toC)] = key;
+  selected = null;
+
+  // Line check at destination
+  const toClear = findLines(toR, toC);
+  if (toClear.length > 0) {
+    consecutiveClears += 1;
+    const mult = consecutiveClears;
+    const base = scoreForClear(toClear.length);
+    const hideBonus = hideNext ? 1 : 0;
+    const gained = base * mult + hideBonus;
+    score += gained;
+    updateStatus(`${toClear.length}個消し! +${gained}点${mult>1 ? ` (x${mult}連鎖)` : ''}`);
+    await runAnim({ kind:'clear', cells: toClear, alpha: 1, duration: 420 });
+    for (const [r,c] of toClear) board[cellIdx(r,c)] = null;
+    scoreEl.textContent = score;
+    if (score > highScore) { highScore = score; hiEl.textContent = highScore; saveHigh(); }
+    // Moving on — player gets another move without new spawns
+  } else {
+    consecutiveClears = 0;
+    // Spawn 3 new chips
+    const placed = spawnChips(NEW_CHIPS_PER_TURN, true);
+    if (placed.length === 0) { endGame(); return; }
+    await runAnim({ kind:'spawn', cells: placed, t:0, duration: 320 });
+    // Check lines formed by spawned chips
+    const spawnedLines = findAllLines();
+    if (spawnedLines.length > 0) {
+      const base = scoreForClear(spawnedLines.length);
+      const gained = Math.max(5, base) + (hideNext ? 1 : 0);
+      score += gained;
+      updateStatus(`新駒でライン! +${gained}点`);
+      await runAnim({ kind:'clear', cells: spawnedLines, alpha: 1, duration: 420 });
+      for (const [r,c] of spawnedLines) board[cellIdx(r,c)] = null;
+      scoreEl.textContent = score;
+      if (score > highScore) { highScore = score; hiEl.textContent = highScore; saveHigh(); }
+    } else {
+      updateStatus('5つ以上並べて消そう');
+    }
+    // Regenerate next queue
+    nextChips = [randChip(), randChip(), randChip()];
+    drawNext();
+    if (emptyCells().length === 0) { endGame(); return; }
+  }
+  drawBoard();
+}
+
+function endGame() {
+  gameOver = true;
+  updateStatus(`ゲームオーバー  最終スコア: ${score}`);
+  // Overlay
+  const lcd = document.getElementById('lcd');
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = `
+    <h2>GAME OVER</h2>
+    <p>${score} points</p>
+    <p style="font-size:14px;opacity:0.8;">${score >= highScore ? '★ NEW HIGH SCORE ★' : 'HIGH: ' + highScore}</p>
+    <button id="overlayNew">PLAY AGAIN</button>
+  `;
+  lcd.appendChild(ov);
+  document.getElementById('overlayNew').onclick = () => {
+    ov.remove();
+    initGame();
+  };
+}
+
+// ===== Input handling =====
+function boardCellFromEvent(ev) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+  const clientY = ev.touches ? ev.touches[0].clientY : ev.clientY;
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
+  const c = Math.floor(x / CELL);
+  const r = Math.floor(y / CELL);
+  if (r<0||r>=N||c<0||c>=N) return null;
+  return { r, c };
+}
+
+function onBoardTap(ev) {
+  ev.preventDefault();
+  if (gameOver || animating) return;
+  const hit = boardCellFromEvent(ev);
+  if (!hit) return;
+  const { r, c } = hit;
+  const key = board[cellIdx(r,c)];
+  if (key) {
+    // Tapping a chip - toggle off if already selected, otherwise select
+    if (selected && selected.r === r && selected.c === c) {
+      selected = null;
+      updateStatus('選択を解除');
+    } else {
+      selected = { r, c };
+      updateStatus(`${PALETTE[key].name}を選択`);
+    }
+    drawBoard();
+  } else if (selected) {
+    // Try to move
+    const fr = selected.r, fc = selected.c;
+    if (isReachable(fr, fc, r, c)) {
+      performMove(fr, fc, r, c);
+    } else {
+      updateStatus('そこへは動けません（壁にふさがれています）');
+      // Keep selection intact - player can try another destination
+    }
+  } else {
+    updateStatus('まず駒をタップしてください');
+  }
+}
+
+canvas.addEventListener('pointerdown', onBoardTap);
+
+document.getElementById('btnNew').onclick = () => {
+  const ov = document.querySelector('.overlay');
+  if (ov) ov.remove();
+  initGame();
+};
+function toggleHide() {
+  hideNext = !hideNext;
+  drawNext();
+  updateStatus(hideNext ? '次の駒を隠した (+1点ボーナス)' : '次の駒を表示');
+}
+document.getElementById('btnHide').onclick = toggleHide;
+nextPreviewEl.addEventListener('click', toggleHide);
+
+// Selection pulse loop
+function pulseLoop() {
+  flashFrame += 1;
+  if (selected && !animating) drawBoard();
+  requestAnimationFrame(pulseLoop);
+}
+
+// ===== Boot =====
+(async () => {
+  await loadHigh();
+  initGame();
+  pulseLoop();
+})();
+</script>
+</body>
+</html>
