@@ -380,151 +380,147 @@
   }
   .footer a { color: #a89164; text-decoration: none; }
 
-  /* Landscape / PC: horizontal layout, no device frame */
+  /* Landscape / PC: horizontal layout within device frame */
   @media (orientation: landscape) {
     body {
-      flex-direction: row;
-      gap: 20px;
-      padding: 16px;
+      padding: 10px;
+      gap: 6px;
     }
-    .masthead, .footer { display: none; }
-
-    /* Hide device frame elements */
-    .device {
-      background: transparent;
-      box-shadow: none;
-      padding: 0;
-      border-radius: 0;
-      max-height: none;
-      max-width: none;
-      display: contents;
-    }
-    .brand { display: none; }
-    .bezel {
-      background: transparent;
-      box-shadow: none;
-      padding: 0;
-      display: contents;
-    }
-    .lcd {
-      background: transparent;
-      box-shadow: none;
-      padding: 0;
-      display: contents;
-    }
-    .lcd::before { display: none; }
-
-    /* Left side: board only */
-    .play-area {
+    .masthead {
       display: block;
+      font-size: 9px;
+    }
+    .masthead small { font-size: 7px; }
+    .footer {
+      display: block;
+      font-size: 7px;
+    }
+
+    /* Device frame - keep beige frame, horizontal inner layout */
+    .device {
+      max-height: calc(100dvh - 50px);
+      max-width: none;
+      padding: 14px 18px 18px;
+      border-radius: 22px;
+    }
+    .brand {
+      display: flex;
+      margin-bottom: 10px;
+      font-size: 10px;
+    }
+
+    .bezel {
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    /* LCD with horizontal internal layout */
+    .lcd {
+      flex-direction: row;
+      padding: 12px;
+      gap: 16px;
+      border-radius: 6px;
+    }
+
+    /* Hide default header position */
+    .lcd-header {
+      display: none;
+    }
+
+    /* Left: board area */
+    .play-area {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       flex: 0 0 auto;
+      order: 1;
     }
     canvas.board {
       width: auto;
-      height: calc(100vh - 32px);
-      height: calc(100dvh - 32px);
-      max-height: 600px;
+      height: calc(100dvh - 160px);
+      max-height: 480px;
+      min-height: 250px;
       aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-      background: linear-gradient(135deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
+      order: 1;
+      flex: 0 0 auto;
     }
 
-    /* Right side: info panel */
-    .lcd-header {
-      position: fixed;
-      right: 16px;
-      top: 16px;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 12px;
-      border: none;
-      padding: 0;
-      margin: 0;
-    }
-    .lcd-header .title {
-      color: #d8c88b;
-      font-size: 28px;
-    }
-    .lcd-header .title small { display: none; }
-    .score-group {
-      flex-direction: column;
-      gap: 8px;
-    }
-    .score-box {
-      text-align: right;
-    }
-    .score-box .label {
-      color: #a89164;
-      font-size: 10px;
-    }
-    .score-box .val {
-      color: #e6d9b8;
-      font-size: 28px;
-    }
-
+    /* Right: sidebar with NEXT */
     .sidebar {
-      position: fixed;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
+      display: flex !important;
       flex-direction: column;
-      gap: 12px;
+      order: 2;
+      width: auto;
+      min-width: 60px;
+      gap: 8px;
       align-items: center;
     }
-    .sidebar-label {
-      color: #a89164;
-      font-size: 10px;
-    }
     .next-preview {
-      display: flex;
       flex-direction: column;
-      padding: 10px;
-      gap: 8px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(168,145,100,0.3);
-      border-radius: 8px;
+      padding: 8px;
+      gap: 6px;
     }
     canvas.chip-slot {
-      width: 48px;
-      height: 48px;
-    }
-    .toggle-hint {
-      color: #6b6048;
+      width: 44px;
+      height: 44px;
     }
 
     .status-line {
-      position: fixed;
-      bottom: 80px;
-      right: 16px;
-      color: #a89164;
-      font-size: 14px;
-      text-align: right;
-      max-width: 180px;
-      white-space: normal;
+      order: 3;
+      margin-top: 6px;
+      font-size: 13px;
     }
 
     .buttons {
-      position: fixed;
-      right: 16px;
-      bottom: 16px;
-      flex-direction: column;
+      margin-top: 12px;
       gap: 8px;
-      margin: 0;
-      padding: 0;
-      width: 140px;
     }
     .hw-btn {
-      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-      border: 1px solid rgba(168,145,100,0.4);
-      color: #d8c88b;
-      padding: 12px 0;
+      padding: 10px 14px;
+      font-size: 10px;
     }
-    .hw-btn.red {
-      background: linear-gradient(180deg, rgba(196,66,54,0.6) 0%, rgba(196,66,54,0.3) 100%);
-      border-color: rgba(196,66,54,0.6);
-      color: #f0d8c8;
+  }
+
+  /* PC with wider screens: show score in sidebar area */
+  @media (orientation: landscape) and (min-width: 700px) {
+    .lcd-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      order: 0;
+      gap: 8px;
+      flex: 0 0 auto;
+      border-right: 1px dashed var(--lcd-line);
+      padding-right: 16px;
+      margin-right: 0;
+    }
+    .lcd-header .title {
+      font-size: 20px;
+      text-align: center;
+    }
+    .lcd-header .title small {
+      display: block;
+      font-size: 7px;
+      margin-top: 2px;
+    }
+    .score-group {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+    .score-box .val {
+      font-size: 24px;
+    }
+    .play-area {
+      order: 1;
+    }
+    .sidebar {
+      order: 2;
+      border-left: 1px dashed var(--lcd-line);
+      padding-left: 12px;
     }
   }
 
