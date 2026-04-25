@@ -500,25 +500,40 @@
       font-size: 6px;
     }
 
-    /* Status line - below board */
+    /* Status line - positioned below LCD */
     .status-line {
-      position: static;
-      order: 2;
-      width: auto;
+      position: absolute;
+      bottom: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
       text-align: center;
       font-size: 12px;
-      margin-top: 4px;
-      flex: 0 0 auto;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Make LCD relative for status positioning */
+    .lcd {
+      position: relative;
+      margin-bottom: 20px;
     }
 
     /* Buttons below bezel */
     .buttons {
-      margin-top: 8px;
+      margin-top: 6px;
       gap: 10px;
     }
     .hw-btn {
       padding: 8px 20px;
       font-size: 10px;
+    }
+
+    /* Fixed width for device to prevent layout shift */
+    .device {
+      min-width: 580px;
     }
   }
 
