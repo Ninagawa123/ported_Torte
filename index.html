@@ -500,25 +500,25 @@
       font-size: 6px;
     }
 
-    /* Status line - positioned below LCD */
+    /* Status line - at the bottom of LCD */
     .status-line {
+      display: block;
       position: absolute;
-      bottom: -22px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 280px;
+      bottom: 8px;
+      left: 120px;
+      right: 90px;
       text-align: center;
-      font-size: 12px;
+      font-size: 13px;
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* Make LCD relative for status positioning */
+    /* LCD needs padding bottom for status and relative positioning */
     .lcd {
       position: relative;
-      margin-bottom: 20px;
+      padding-bottom: 28px;
     }
 
     /* Buttons below bezel */
