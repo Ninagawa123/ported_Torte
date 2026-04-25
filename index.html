@@ -25,7 +25,12 @@
   html, body {
     margin: 0;
     padding: 0;
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
     background:
       radial-gradient(circle at 20% 10%, #2a2519 0%, #15120c 70%),
       #15120c;
@@ -33,46 +38,55 @@
     color: #e6d9b8;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
   }
   body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 16px 60px;
-    gap: 16px;
+    justify-content: center;
+    padding: 8px;
+    gap: 8px;
+    box-sizing: border-box;
   }
 
   .masthead {
     text-align: center;
     font-family: "Silkscreen", monospace;
     color: #d8c88b;
-    letter-spacing: 0.25em;
-    font-size: 11px;
+    letter-spacing: 0.2em;
+    font-size: 10px;
     opacity: 0.7;
     text-transform: uppercase;
+    flex-shrink: 0;
   }
   .masthead small {
     display: block;
-    font-size: 9px;
-    letter-spacing: 0.4em;
+    font-size: 8px;
+    letter-spacing: 0.3em;
     opacity: 0.6;
     margin-top: 2px;
   }
 
   /* --- Palm Pilot case --- */
   .device {
-    width: min(420px, 96vw);
+    width: 100%;
+    max-width: 420px;
     background:
       linear-gradient(180deg, #e5dfd0 0%, #cec7b2 10%, #b8b19d 55%, #8d886f 100%);
-    border-radius: 28px;
-    padding: 22px 22px 30px;
+    border-radius: 20px;
+    padding: 16px 16px 20px;
     box-shadow:
       inset 0 2px 0 rgba(255,255,255,0.6),
       inset 0 -3px 0 rgba(0,0,0,0.25),
-      0 18px 40px rgba(0,0,0,0.6),
+      0 12px 30px rgba(0,0,0,0.6),
       0 0 0 1px rgba(0,0,0,0.35);
     position: relative;
+    box-sizing: border-box;
+    flex-shrink: 0;
   }
 
   /* Top speaker grille / brand line */
@@ -329,25 +343,75 @@
 
   .footer {
     font-family: "Silkscreen", monospace;
-    font-size: 9px;
-    letter-spacing: 0.25em;
+    font-size: 8px;
+    letter-spacing: 0.2em;
     color: #6b6048;
     text-align: center;
-    margin-top: -4px;
-    line-height: 1.6;
+    line-height: 1.5;
+    flex-shrink: 0;
   }
   .footer a { color: #a89164; text-decoration: none; }
 
+  /* Landscape orientation warning */
+  .rotate-msg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #15120c;
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    color: #d8c88b;
+    font-family: "Silkscreen", monospace;
+    text-align: center;
+  }
+  .rotate-msg .icon {
+    font-size: 48px;
+    animation: rotate-hint 1.5s ease-in-out infinite;
+  }
+  @keyframes rotate-hint {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+  .rotate-msg p {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    opacity: 0.8;
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .rotate-msg { display: flex; }
+    .masthead, .device, .footer { display: none; }
+  }
+
   @media (max-width: 380px) {
-    .device { padding: 16px 16px 22px; }
-    .lcd { padding: 10px; }
+    .device { padding: 12px 12px 16px; border-radius: 16px; }
+    .lcd { padding: 8px; }
+    .lcd-header .title { font-size: 18px; }
+    .lcd-header .title small { font-size: 7px; }
+    .score-box .val { font-size: 18px; }
     .sidebar-label { font-size: 8px; }
-    canvas.chip-slot { width: 34px; height: 34px; }
-    .sidebar { min-width: 48px; }
+    canvas.chip-slot { width: 32px; height: 32px; }
+    .sidebar { min-width: 44px; gap: 6px; }
+    .buttons { margin-top: 12px; gap: 8px; }
+    .hw-btn { padding: 8px 0; font-size: 10px; }
+    .status-line { font-size: 14px; margin-top: 6px; }
+  }
+
+  @media (max-height: 650px) and (orientation: portrait) {
+    .masthead { display: none; }
+    .footer { display: none; }
   }
 </style>
 </head>
 <body>
+
+<div class="rotate-msg">
+  <div class="icon">📱</div>
+  <p>ROTATE TO PORTRAIT</p>
+</div>
 
 <div class="masthead">
   TORTE &nbsp;/&nbsp; Palm Pilot solitaire (1997) &nbsp;/&nbsp; browser port
@@ -906,6 +970,19 @@ function pulseLoop() {
   if (selected && !animating) drawBoard();
   requestAnimationFrame(pulseLoop);
 }
+
+// ===== Prevent all zoom/scroll on iOS =====
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', e => {
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+document.addEventListener('gestureend', e => e.preventDefault());
 
 // ===== Boot =====
 (async () => {
