@@ -380,48 +380,152 @@
   }
   .footer a { color: #a89164; text-decoration: none; }
 
-  /* Landscape: NEXT on right side */
+  /* Landscape / PC: horizontal layout, no device frame */
   @media (orientation: landscape) {
-    .play-area {
-      display: flex;
+    body {
       flex-direction: row;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
+      gap: 20px;
+      padding: 16px;
+    }
+    .masthead, .footer { display: none; }
+
+    /* Hide device frame elements */
+    .device {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      border-radius: 0;
+      max-height: none;
+      max-width: none;
+      display: contents;
+    }
+    .brand { display: none; }
+    .bezel {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      display: contents;
+    }
+    .lcd {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      display: contents;
+    }
+    .lcd::before { display: none; }
+
+    /* Left side: board only */
+    .play-area {
+      display: block;
+      flex: 0 0 auto;
     }
     canvas.board {
-      order: 1;
-      flex: 0 1 auto;
-      max-width: calc(100% - 70px);
       width: auto;
-      height: 100%;
+      height: calc(100vh - 32px);
+      height: calc(100dvh - 32px);
+      max-height: 600px;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      background: linear-gradient(135deg, var(--lcd-bg) 0%, var(--lcd-bg-2) 100%);
     }
+
+    /* Right side: info panel */
+    .lcd-header {
+      position: fixed;
+      right: 16px;
+      top: 16px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    .lcd-header .title {
+      color: #d8c88b;
+      font-size: 28px;
+    }
+    .lcd-header .title small { display: none; }
+    .score-group {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .score-box {
+      text-align: right;
+    }
+    .score-box .label {
+      color: #a89164;
+      font-size: 10px;
+    }
+    .score-box .val {
+      color: #e6d9b8;
+      font-size: 28px;
+    }
+
     .sidebar {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      order: 2;
-      width: auto;
-      min-width: 55px;
-      flex: 0 0 auto;
+      gap: 12px;
       align-items: center;
-      gap: 8px;
+    }
+    .sidebar-label {
+      color: #a89164;
+      font-size: 10px;
     }
     .next-preview {
       display: flex;
       flex-direction: column;
-      padding: 6px;
-      gap: 6px;
+      padding: 10px;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(168,145,100,0.3);
+      border-radius: 8px;
     }
     canvas.chip-slot {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
     }
-    .masthead, .footer { display: none; }
-    .device { max-height: calc(100dvh - 16px); }
-    .lcd { padding: 10px; }
-    .lcd-header .title { font-size: 18px; }
-    .lcd-header .title small { display: none; }
-    .buttons { margin-top: 10px; }
+    .toggle-hint {
+      color: #6b6048;
+    }
+
+    .status-line {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      color: #a89164;
+      font-size: 14px;
+      text-align: right;
+      max-width: 180px;
+      white-space: normal;
+    }
+
+    .buttons {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      width: 140px;
+    }
+    .hw-btn {
+      background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+      border: 1px solid rgba(168,145,100,0.4);
+      color: #d8c88b;
+      padding: 12px 0;
+    }
+    .hw-btn.red {
+      background: linear-gradient(180deg, rgba(196,66,54,0.6) 0%, rgba(196,66,54,0.3) 100%);
+      border-color: rgba(196,66,54,0.6);
+      color: #f0d8c8;
+    }
   }
 
   /* Small portrait screens */
