@@ -386,31 +386,39 @@
       display: flex;
       flex-direction: row;
       gap: 10px;
-      align-items: stretch;
+      align-items: center;
+      justify-content: center;
     }
     canvas.board {
       order: 1;
-      flex: 1;
-      max-width: none;
+      flex: 0 1 auto;
+      max-width: calc(100% - 70px);
+      width: auto;
+      height: 100%;
     }
     .sidebar {
+      display: flex;
       flex-direction: column;
       order: 2;
       width: auto;
-      min-width: 50px;
+      min-width: 55px;
       flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
     }
     .next-preview {
+      display: flex;
       flex-direction: column;
       padding: 6px;
+      gap: 6px;
     }
     canvas.chip-slot {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
     }
     .masthead, .footer { display: none; }
     .device { max-height: calc(100dvh - 16px); }
-    .lcd { padding: 8px; }
+    .lcd { padding: 10px; }
     .lcd-header .title { font-size: 18px; }
     .lcd-header .title small { display: none; }
     .buttons { margin-top: 10px; }
