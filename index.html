@@ -383,8 +383,8 @@
   /* Landscape / PC: horizontal layout within device frame */
   @media (orientation: landscape) {
     body {
-      padding: 8px;
-      gap: 4px;
+      padding: 6px;
+      gap: 3px;
     }
     .masthead {
       display: block;
@@ -398,30 +398,30 @@
 
     /* Device frame - keep beige frame */
     .device {
-      max-height: calc(100dvh - 44px);
+      max-height: calc(100dvh - 40px);
       max-width: none;
-      padding: 10px 14px 14px;
-      border-radius: 20px;
+      padding: 8px 12px 10px;
+      border-radius: 18px;
       flex-shrink: 1;
     }
     .brand {
       display: flex;
-      margin-bottom: 8px;
-      font-size: 10px;
+      margin-bottom: 6px;
+      font-size: 9px;
     }
 
     .bezel {
-      padding: 8px;
+      padding: 6px;
       border-radius: 10px;
     }
 
-    /* LCD - stable horizontal layout */
+    /* LCD - horizontal layout */
     .lcd {
       flex-direction: row;
-      padding: 10px;
-      gap: 12px;
+      padding: 8px;
+      gap: 10px;
       border-radius: 6px;
-      align-items: stretch;
+      align-items: center;
     }
 
     /* Left column: Title + Score */
@@ -434,81 +434,86 @@
       padding-bottom: 0;
       margin-bottom: 0;
       order: 0;
-      gap: 12px;
-      flex: 0 0 100px;
+      gap: 10px;
+      flex: 0 0 90px;
       border-right: 1px dashed var(--lcd-line);
-      padding-right: 12px;
+      padding-right: 10px;
     }
     .lcd-header .title {
       font-size: 18px;
       text-align: center;
+      white-space: nowrap;
     }
     .lcd-header .title small {
-      display: block;
-      font-size: 6px;
-      margin-top: 2px;
+      display: none;
     }
     .score-group {
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       text-align: center;
     }
     .score-box .val {
-      font-size: 22px;
+      font-size: 20px;
     }
 
-    /* Center: board only (no sidebar here) */
+    /* Center: board + sidebar */
     .play-area {
-      display: block;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
       flex: 0 0 auto;
       order: 1;
     }
     canvas.board {
       width: auto;
-      height: calc(100dvh - 140px);
-      max-height: 520px;
+      height: calc(100dvh - 130px);
+      max-height: 480px;
       min-height: 200px;
       aspect-ratio: 1 / 1;
       order: 1;
+      flex: 0 0 auto;
     }
 
-    /* Right column: NEXT */
+    /* Right: NEXT (inside play-area) */
     .sidebar {
       display: flex !important;
       flex-direction: column;
       order: 2;
-      flex: 0 0 70px;
-      gap: 8px;
+      width: 60px;
+      gap: 6px;
       align-items: center;
       justify-content: center;
       border-left: 1px dashed var(--lcd-line);
-      padding-left: 12px;
+      padding-left: 10px;
     }
     .next-preview {
       flex-direction: column;
-      padding: 6px;
-      gap: 5px;
+      padding: 5px;
+      gap: 4px;
     }
     canvas.chip-slot {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
+    }
+    .toggle-hint {
+      font-size: 6px;
     }
 
-    /* Status line - fixed width to prevent layout shift */
+    /* Status line - below board */
     .status-line {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
+      position: static;
+      order: 2;
+      width: auto;
       text-align: center;
       font-size: 12px;
-      margin: 0;
+      margin-top: 4px;
+      flex: 0 0 auto;
     }
 
     /* Buttons below bezel */
     .buttons {
-      margin-top: 10px;
+      margin-top: 8px;
       gap: 10px;
     }
     .hw-btn {
@@ -520,23 +525,25 @@
   /* Wider screens: larger elements */
   @media (orientation: landscape) and (min-width: 900px) {
     .lcd-header {
-      flex: 0 0 120px;
+      flex: 0 0 110px;
     }
     .lcd-header .title {
       font-size: 22px;
     }
     .lcd-header .title small {
-      font-size: 7px;
+      display: block;
+      font-size: 6px;
+      white-space: nowrap;
     }
     .score-box .val {
-      font-size: 26px;
+      font-size: 24px;
     }
     .sidebar {
-      flex: 0 0 80px;
+      width: 70px;
     }
     canvas.chip-slot {
-      width: 46px;
-      height: 46px;
+      width: 42px;
+      height: 42px;
     }
     canvas.board {
       max-height: 560px;
