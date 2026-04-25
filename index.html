@@ -383,8 +383,8 @@
   /* Landscape / PC: horizontal layout within device frame */
   @media (orientation: landscape) {
     body {
-      padding: 10px;
-      gap: 6px;
+      padding: 8px;
+      gap: 4px;
     }
     .masthead {
       display: block;
@@ -396,114 +396,56 @@
       font-size: 7px;
     }
 
-    /* Device frame - keep beige frame, horizontal inner layout */
+    /* Device frame - keep beige frame */
     .device {
-      max-height: calc(100dvh - 50px);
+      max-height: calc(100dvh - 44px);
       max-width: none;
-      padding: 14px 18px 18px;
-      border-radius: 22px;
+      padding: 10px 14px 14px;
+      border-radius: 20px;
+      flex-shrink: 1;
     }
     .brand {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       font-size: 10px;
     }
 
     .bezel {
-      padding: 10px;
-      border-radius: 12px;
+      padding: 8px;
+      border-radius: 10px;
     }
 
-    /* LCD with horizontal internal layout */
+    /* LCD - stable horizontal layout */
     .lcd {
       flex-direction: row;
-      padding: 12px;
-      gap: 16px;
+      padding: 10px;
+      gap: 12px;
       border-radius: 6px;
+      align-items: stretch;
     }
 
-    /* Hide default header position */
-    .lcd-header {
-      display: none;
-    }
-
-    /* Left: board area */
-    .play-area {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex: 0 0 auto;
-      order: 1;
-    }
-    canvas.board {
-      width: auto;
-      height: calc(100dvh - 160px);
-      max-height: 480px;
-      min-height: 250px;
-      aspect-ratio: 1 / 1;
-      order: 1;
-      flex: 0 0 auto;
-    }
-
-    /* Right: sidebar with NEXT */
-    .sidebar {
-      display: flex !important;
-      flex-direction: column;
-      order: 2;
-      width: auto;
-      min-width: 60px;
-      gap: 8px;
-      align-items: center;
-    }
-    .next-preview {
-      flex-direction: column;
-      padding: 8px;
-      gap: 6px;
-    }
-    canvas.chip-slot {
-      width: 44px;
-      height: 44px;
-    }
-
-    .status-line {
-      order: 3;
-      margin-top: 6px;
-      font-size: 13px;
-    }
-
-    .buttons {
-      margin-top: 12px;
-      gap: 8px;
-    }
-    .hw-btn {
-      padding: 10px 14px;
-      font-size: 10px;
-    }
-  }
-
-  /* PC with wider screens: show score in sidebar area */
-  @media (orientation: landscape) and (min-width: 700px) {
+    /* Left column: Title + Score */
     .lcd-header {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       border-bottom: none;
       padding-bottom: 0;
       margin-bottom: 0;
       order: 0;
-      gap: 8px;
-      flex: 0 0 auto;
+      gap: 12px;
+      flex: 0 0 100px;
       border-right: 1px dashed var(--lcd-line);
-      padding-right: 16px;
-      margin-right: 0;
+      padding-right: 12px;
     }
     .lcd-header .title {
-      font-size: 20px;
+      font-size: 18px;
       text-align: center;
     }
     .lcd-header .title small {
       display: block;
-      font-size: 7px;
+      font-size: 6px;
       margin-top: 2px;
     }
     .score-group {
@@ -512,15 +454,92 @@
       text-align: center;
     }
     .score-box .val {
-      font-size: 24px;
+      font-size: 22px;
     }
+
+    /* Center: board only (no sidebar here) */
     .play-area {
+      display: block;
+      flex: 0 0 auto;
       order: 1;
     }
+    canvas.board {
+      width: auto;
+      height: calc(100dvh - 140px);
+      max-height: 520px;
+      min-height: 200px;
+      aspect-ratio: 1 / 1;
+      order: 1;
+    }
+
+    /* Right column: NEXT */
     .sidebar {
+      display: flex !important;
+      flex-direction: column;
       order: 2;
+      flex: 0 0 70px;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
       border-left: 1px dashed var(--lcd-line);
       padding-left: 12px;
+    }
+    .next-preview {
+      flex-direction: column;
+      padding: 6px;
+      gap: 5px;
+    }
+    canvas.chip-slot {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Status line - fixed width to prevent layout shift */
+    .status-line {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      text-align: center;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    /* Buttons below bezel */
+    .buttons {
+      margin-top: 10px;
+      gap: 10px;
+    }
+    .hw-btn {
+      padding: 8px 20px;
+      font-size: 10px;
+    }
+  }
+
+  /* Wider screens: larger elements */
+  @media (orientation: landscape) and (min-width: 900px) {
+    .lcd-header {
+      flex: 0 0 120px;
+    }
+    .lcd-header .title {
+      font-size: 22px;
+    }
+    .lcd-header .title small {
+      font-size: 7px;
+    }
+    .score-box .val {
+      font-size: 26px;
+    }
+    .sidebar {
+      flex: 0 0 80px;
+    }
+    canvas.chip-slot {
+      width: 46px;
+      height: 46px;
+    }
+    canvas.board {
+      max-height: 560px;
     }
   }
 
@@ -1083,16 +1102,36 @@ function onBoardTap(ev) {
   }
 }
 
-// Use touchstart instead of pointerdown for better iOS control
+// Canvas touch handling with double-tap prevention
+let canvasLastTap = 0;
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   e.stopPropagation();
+  e.stopImmediatePropagation();
+
+  const now = Date.now();
+  // Ignore rapid successive taps (debounce)
+  if (now - canvasLastTap < 100) return;
+  canvasLastTap = now;
+
   onBoardTap(e);
-}, { passive: false });
+}, { passive: false, capture: true });
+
 canvas.addEventListener('touchend', e => {
   e.preventDefault();
   e.stopPropagation();
+  e.stopImmediatePropagation();
+}, { passive: false, capture: true });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  e.stopPropagation();
 }, { passive: false });
+
+canvas.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+canvas.addEventListener('gestureend', e => e.preventDefault(), { passive: false });
+
 // Fallback for mouse
 canvas.addEventListener('mousedown', onBoardTap);
 
@@ -1143,25 +1182,32 @@ function pulseLoop() {
 // ===== Prevent all zoom/scroll on iOS =====
 let lastTouchEnd = 0;
 let lastTouchStart = 0;
+let touchCount = 0;
 
-// Prevent double-tap zoom on touchstart
+// Prevent double-tap zoom on touchstart - always preventDefault for safety
 document.addEventListener('touchstart', e => {
   const now = Date.now();
-  // Detect double-tap (two taps within 300ms)
-  if (now - lastTouchStart <= 300 && e.touches.length === 1) {
+  touchCount++;
+
+  // Detect rapid taps (potential double-tap zoom trigger)
+  if (now - lastTouchStart <= 350) {
     e.preventDefault();
   }
   lastTouchStart = now;
+
   // Always prevent multi-touch
   if (e.touches.length > 1) {
     e.preventDefault();
   }
+
+  // Reset touch count after delay
+  setTimeout(() => { touchCount = 0; }, 400);
 }, { passive: false });
 
 // Prevent double-tap zoom on touchend
 document.addEventListener('touchend', e => {
   const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
+  if (now - lastTouchEnd <= 350) {
     e.preventDefault();
   }
   lastTouchEnd = now;
