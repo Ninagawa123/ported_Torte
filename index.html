@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Torte — ver.0.7 browser port</title>
+<title>Torte — ver.0.8 browser port</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
@@ -33,6 +33,7 @@
     color: #e6d9b8;
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   body {
     display: flex;
@@ -357,7 +358,7 @@
   <div class="brand">
     <span>TORTE</span>
     <div class="dots"><span></span><span></span><span></span><span></span></div>
-    <span>v.0.7</span>
+    <span>v.0.8</span>
   </div>
 
   <div class="bezel">
@@ -425,12 +426,12 @@ const SPRITES = {
 // they actually depict (not my initial guesses — they're a food cornucopia:
 // cocktail glass, sundae, cupcake, shrimp, grapes, twin cherries, pastry roll).
 const PALETTE = {
-  cherry:     { fill: '#a8833a', shade: '#6b531e', name: 'グラス' },     // martini glass
-  apple:      { fill: '#4e9a3d', shade: '#2f6826', name: 'アイス' },      // ice cream sundae
-  watermelon: { fill: '#d64663', shade: '#8f2841', name: 'ケーキ' },      // cupcake
-  pineapple:  { fill: '#e89a1a', shade: '#a66a08', name: 'エビ' },        // shrimp
+  cherry:     { fill: '#a8833a', shade: '#6b531e', name: 'カクテル' },     // martini glass
+  apple:      { fill: '#4e9a3d', shade: '#2f6826', name: 'かき氷' },      // ice cream sundae
+  watermelon: { fill: '#d64663', shade: '#8f2841', name: 'ナシ' },      // cupcake
+  pineapple:  { fill: '#e89a1a', shade: '#a66a08', name: 'バナナ' },        // shrimp
   grapes:     { fill: '#7a4cb0', shade: '#482a6a', name: 'ぶどう' },      // grapes
-  pear:       { fill: '#c42e3b', shade: '#8b1e28', name: 'さくらんぼ' },  // twin cherries
+  pear:       { fill: '#c42e3b', shade: '#8b1e28', name: 'チェリー' },  // twin cherries
   orange:     { fill: '#b06820', shade: '#6a3a0e', name: 'パン' },        // pastry roll
 };
 const CHIP_KEYS = Object.keys(SPRITES);
