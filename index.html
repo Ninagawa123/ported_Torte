@@ -57,7 +57,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px;
+    padding: 8px max(8px, env(safe-area-inset-left, 0px)) 8px max(8px, env(safe-area-inset-right, 0px));
     gap: 8px;
     box-sizing: border-box;
   }
@@ -83,7 +83,8 @@
   /* --- Palm Pilot case --- */
   .device {
     width: auto;
-    max-width: calc(100vw - 24px);
+    max-width: calc(100vw - 16px);
+    max-width: min(calc(100vw - 16px), calc(100dvw - 16px));
     max-height: calc(100vh - 24px);
     max-height: calc(100dvh - 24px);
     background:
@@ -574,18 +575,102 @@
     }
   }
 
+  /* Narrow portrait: maximize board width (~10px total horizontal margin), compact NEXT */
+  @media (max-width: 520px) and (orientation: portrait) {
+    body {
+      padding: 5px max(5px, env(safe-area-inset-left, 0px)) 5px max(5px, env(safe-area-inset-right, 0px));
+      gap: 4px;
+    }
+    .device {
+      width: 100%;
+      max-width: min(calc(100vw - 10px), calc(100dvw - 10px));
+      padding: 10px 6px 12px;
+      border-radius: 14px;
+    }
+    .brand {
+      margin-bottom: 8px;
+      font-size: 9px;
+      padding: 0 2px;
+    }
+    .bezel { padding: 6px; border-radius: 12px; }
+    .lcd {
+      padding: 6px 5px 8px;
+      border-radius: 5px;
+    }
+    .lcd-header {
+      margin-bottom: 5px;
+      padding-bottom: 4px;
+      gap: 6px;
+    }
+    .lcd-header .title { font-size: 18px; }
+    .lcd-header .title small { font-size: 6px; margin-top: 2px; }
+    .score-group { gap: 10px; }
+    .score-box .val { font-size: 18px; }
+    .play-area {
+      align-items: stretch;
+      width: 100%;
+      gap: 4px;
+    }
+    canvas.board {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      flex: 1 1 auto;
+      min-height: 0;
+      align-self: center;
+    }
+    .sidebar {
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+    .sidebar-label {
+      font-size: 7px;
+      letter-spacing: 0.12em;
+    }
+    .next-preview {
+      gap: 2px;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    canvas.chip-slot {
+      width: 20px;
+      height: 20px;
+    }
+    .toggle-hint {
+      font-size: 5px;
+      letter-spacing: 0.06em;
+    }
+    .buttons {
+      margin-top: 10px;
+      padding: 0 4px;
+      gap: 8px;
+    }
+    .hw-btn {
+      padding: 8px 0;
+      font-size: 10px;
+    }
+    .status-line {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+    }
+  }
+
   /* Small portrait screens */
   @media (max-width: 380px) and (orientation: portrait) {
-    .device { padding: 10px 10px 14px; border-radius: 14px; }
-    .lcd { padding: 8px; }
+    .device { padding: 8px 5px 12px; border-radius: 12px; }
+    .lcd { padding: 5px 4px 6px; }
     .lcd-header .title { font-size: 16px; }
     .lcd-header .title small { font-size: 6px; }
     .score-box .val { font-size: 18px; }
-    .sidebar-label { font-size: 8px; }
-    canvas.chip-slot { width: 28px; height: 28px; }
-    .buttons { margin-top: 10px; gap: 8px; }
-    .hw-btn { padding: 8px 0; font-size: 10px; }
-    .status-line { font-size: 14px; margin-top: 6px; }
+    .sidebar-label { font-size: 6px; }
+    canvas.chip-slot { width: 18px; height: 18px; }
+    .next-preview { padding: 2px 4px; gap: 2px; }
+    .buttons { margin-top: 8px; gap: 6px; }
+    .hw-btn { padding: 8px 0; font-size: 9px; }
+    .status-line { font-size: 13px; margin-top: 4px; }
   }
 
   /* Hide masthead/footer when vertical space is tight */
@@ -715,6 +800,17 @@ const hiEl = document.getElementById('hi');
 const statusEl = document.getElementById('status');
 const hideHintEl = document.getElementById('hideHint');
 const nextPreviewEl = document.getElementById('nextPreview');
+
+// Many mobile browsers fire a synthetic mouse sequence after touch; paired
+// touchstart + mousedown/click handlers would otherwise double-fire.
+let suppressMouseUntil = 0;
+const SYNTHETIC_MOUSE_MS = 450;
+function noteTouchInput() {
+  suppressMouseUntil = Date.now() + SYNTHETIC_MOUSE_MS;
+}
+function isSyntheticMouse(ev) {
+  return (ev.type === 'mousedown' || ev.type === 'click') && Date.now() < suppressMouseUntil;
+}
 
 // ===== Persistent high score =====
 // Prefers localStorage (works on any regular browser) with a fallback to
@@ -863,13 +959,14 @@ function drawNext() {
     if (hideNext) {
       // draw a "?" sprite inspired by the original's hidden-chip glyph
       cctx.fillStyle = 'rgba(42,54,36,0.75)';
-      cctx.font = 'bold 28px "VT323", monospace';
+      const qPx = Math.min(30, Math.max(9, Math.round(c.width * 0.58)));
+      cctx.font = `bold ${qPx}px "VT323", monospace`;
       cctx.textAlign = 'center';
       cctx.textBaseline = 'middle';
-      cctx.fillText('?', c.width/2, c.height/2 + 2);
+      cctx.fillText('?', c.width/2, c.height/2 + 1);
     } else {
       const key = nextChips[i];
-      const scale = 3; // 13*3 = 39, canvas is 42 → 1-2 px margin
+      const scale = Math.max(2, Math.min(3, Math.floor(c.width / 14)));
       drawChip(cctx, (c.width - 13*scale)/2, (c.height - 13*scale)/2, key, scale);
     }
   });
@@ -1090,15 +1187,32 @@ function endGame() {
 // ===== Input handling =====
 function boardCellFromEvent(ev) {
   const rect = canvas.getBoundingClientRect();
+  if (rect.width < 1 || rect.height < 1) return null;
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
-  const clientY = ev.touches ? ev.touches[0].clientY : ev.clientY;
-  const x = (clientX - rect.left) * scaleX;
-  const y = (clientY - rect.top) * scaleY;
-  const c = Math.floor(x / CELL);
-  const r = Math.floor(y / CELL);
-  if (r<0||r>=N||c<0||c>=N) return null;
+  const t = (ev.touches && ev.touches[0]) || (ev.changedTouches && ev.changedTouches[0]) || ev;
+  const clientX = t.clientX;
+  const clientY = t.clientY;
+  // iPhone screen edges: slight miss + subpixel getBoundingClientRect → map near-edge touches
+  // into column 0 / N-1, but ignore taps clearly away from the board.
+  const EDGE_SLOP_CSS = 14;
+  if (clientX < rect.left - EDGE_SLOP_CSS || clientX > rect.right + EDGE_SLOP_CSS ||
+      clientY < rect.top - EDGE_SLOP_CSS || clientY > rect.bottom + EDGE_SLOP_CSS) {
+    return null;
+  }
+  let u = clientX - rect.left;
+  let v = clientY - rect.top;
+  u = Math.min(rect.width + EDGE_SLOP_CSS, Math.max(-EDGE_SLOP_CSS, u));
+  v = Math.min(rect.height + EDGE_SLOP_CSS, Math.max(-EDGE_SLOP_CSS, v));
+  const W = canvas.width;
+  const H = canvas.height;
+  const eps = 1e-4;
+  let x = u * scaleX;
+  let y = v * scaleY;
+  x = Math.min(Math.max(0, x), W - eps);
+  y = Math.min(Math.max(0, y), H - eps);
+  const c = Math.min(N - 1, Math.max(0, Math.floor(x / CELL)));
+  const r = Math.min(N - 1, Math.max(0, Math.floor(y / CELL)));
   return { r, c };
 }
 
@@ -1145,6 +1259,7 @@ canvas.addEventListener('touchstart', e => {
   if (now - canvasLastTap < 100) return;
   canvasLastTap = now;
 
+  noteTouchInput();
   onBoardTap(e);
 }, { passive: false, capture: true });
 
@@ -1163,13 +1278,17 @@ canvas.addEventListener('gesturestart', e => e.preventDefault(), { passive: fals
 canvas.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 canvas.addEventListener('gestureend', e => e.preventDefault(), { passive: false });
 
-// Fallback for mouse
-canvas.addEventListener('mousedown', onBoardTap);
+// Fallback for mouse (skip ghost mousedown after touch)
+canvas.addEventListener('mousedown', (e) => {
+  if (isSyntheticMouse(e)) return;
+  onBoardTap(e);
+});
 
 const btnNew = document.getElementById('btnNew');
 const btnHide = document.getElementById('btnHide');
 
 function handleNewGame(e) {
+  if (isSyntheticMouse(e)) return;
   e.preventDefault();
   e.stopPropagation();
   const ov = document.querySelector('.overlay');
@@ -1177,10 +1296,14 @@ function handleNewGame(e) {
   resetZoom();
   initGame();
 }
-btnNew.addEventListener('touchstart', handleNewGame, { passive: false });
+btnNew.addEventListener('touchstart', (e) => {
+  noteTouchInput();
+  handleNewGame(e);
+}, { passive: false });
 btnNew.addEventListener('click', handleNewGame);
 
 function toggleHide(e) {
+  if (e && isSyntheticMouse(e)) return;
   if (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -1189,9 +1312,15 @@ function toggleHide(e) {
   drawNext();
   updateStatus(hideNext ? '次の駒を隠した (+1点ボーナス)' : '次の駒を表示');
 }
-btnHide.addEventListener('touchstart', toggleHide, { passive: false });
+btnHide.addEventListener('touchstart', (e) => {
+  noteTouchInput();
+  toggleHide(e);
+}, { passive: false });
 btnHide.addEventListener('click', toggleHide);
-nextPreviewEl.addEventListener('touchstart', toggleHide, { passive: false });
+nextPreviewEl.addEventListener('touchstart', (e) => {
+  noteTouchInput();
+  toggleHide(e);
+}, { passive: false });
 nextPreviewEl.addEventListener('click', toggleHide);
 
 // Force reset zoom
